@@ -1,0 +1,19 @@
+name: SnykMonoReposcan
+on:
+  push
+
+jobs:
+  SnykCode:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: SnykcodeScanning
+      run: |
+         echo "----------Download Latest Snyk CLI-----------"
+         curl -Lo ./snyk "https://github.com/snyk/snyk/releases/download/v1.1200.0/snyk-linux"
+         chmod +x snyk
+         ls -lrt
+         echo "----------Authenticating Snyk-----------"
+         ./snyk auth ${{secrets.Snyk_token}}
+         echo "----------Snyk Scanning-----------"
+         ./snyk test --all-projects -d --skip-unresolved
