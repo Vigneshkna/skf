@@ -1,0 +1,35 @@
+name: Truffle Hog Scan
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  truffle-hog-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          
+      # - name: Run Truffle Hog
+      #   run: | 
+      #     pip install trufflehog
+      #     trufflehog --regex https://$GITHUB_ACTOR:${{ secrets.ACCESS_TOKEN }}@github.com/DigitalInnovation/PrScanBot-Test.git          
+      #   env:
+      #     GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: TruffleHog Bot scan
+        continue-on-error: true
+        uses: trufflesecurity/TruffleHog-Enterprise-Github-Action@main
+        with:
+            args: --fail-verified ${{ github.event.repository.default_branch }} HEAD --json 
+          
+      - name: Upload findings to GitHub Security
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trufflehog-report.json
